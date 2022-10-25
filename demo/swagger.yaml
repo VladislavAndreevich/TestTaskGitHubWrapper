@@ -1,0 +1,105 @@
+---
+swagger: "2.0"
+info:
+  title: "GitHub api wrapper"
+  version: "1.0"
+host: "localhost:8080"
+schemes:
+- "http"
+consumes:
+- application/json
+produces:
+- application/json
+securityDefinitions:
+  BasicAuth:
+    type: basic
+security:
+  - BasicAuth: []
+paths:
+  /users/{username}/repos:
+    get:
+      tags:
+        - User repository
+      summary: API to get not forks repos by username
+      operationId: getAllRepositoriesByCustomerName
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: username
+          in: path
+          type: string
+          required: true
+          description: GitHub username
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/arrayOfNotForksRepositoryesForUsername'
+        '404':
+          description: 'Not Found'
+          schema:
+            $ref: '#/definitions/Error'
+        '406':
+          description: 'Not Acceptable'
+          schema:
+            $ref: '#/definitions/Error'
+    
+definitions:
+
+  arrayOfNotForksRepositoryesForUsername:
+    title: List repos 
+    description: List not forked repos for username 
+    type: array
+    items:
+      $ref: '#/definitions/repository'
+          
+  repository:
+    title: repository
+    description: model to represent repository info
+    type: object
+    required:
+      - name
+      - owner
+      - branches
+    properties:
+      name:
+        type: string
+        description: Repo name
+        example: "repositoryName"
+      owner:
+        type: string
+        description: Owner
+        example: "ownerName"
+      branches:
+        $ref: '#/definitions/branch'
+          
+  branch:
+    title: branch
+    description: model to represent branch info
+    type: object
+    required:
+      - name
+      - sha
+    properties:
+      name:
+        type: string
+        description: Branch name
+        example: "master"
+      sha:
+        type: string
+        description: commit sha
+        example: "9d6d14455e209fc60d1a7c9ce3477a56b42bf11e"
+
+  Error:
+    type: object
+    required:
+    - code
+    properties:
+      status:
+        type: string
+        description: Specified code to identify the error occurred
+      message:
+        type: string
+        description: Localized message to be used as a presentation of error

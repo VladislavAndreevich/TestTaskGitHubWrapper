@@ -5,11 +5,11 @@ info:
   version: "1.0"
 host: "localhost:8080"
 schemes:
-- "http"
+  - "http"
 consumes:
-- application/json
+  - application/json
 produces:
-- application/json
+  - application/json
 securityDefinitions:
   BasicAuth:
     type: basic
@@ -32,6 +32,11 @@ paths:
           type: string
           required: true
           description: GitHub username
+        - in: query
+          name: token
+          type: string
+          required: false
+          description: acces token to increase rate limit
       responses:
         '200':
           description: OK
@@ -45,16 +50,16 @@ paths:
           description: 'Not Acceptable'
           schema:
             $ref: '#/definitions/Error'
-    
+
 definitions:
 
   arrayOfNotForksRepositoryesForUsername:
-    title: List repos 
-    description: List not forked repos for username 
+    title: List repos
+    description: List not forked repos for username
     type: array
     items:
       $ref: '#/definitions/repository'
-          
+
   repository:
     title: repository
     description: model to represent repository info
@@ -74,7 +79,7 @@ definitions:
         example: "ownerName"
       branches:
         $ref: '#/definitions/branch'
-          
+
   branch:
     title: branch
     description: model to represent branch info
@@ -95,7 +100,7 @@ definitions:
   Error:
     type: object
     required:
-    - code
+      - code
     properties:
       status:
         type: string

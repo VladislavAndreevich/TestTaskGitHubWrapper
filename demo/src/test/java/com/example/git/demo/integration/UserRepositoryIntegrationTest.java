@@ -1,10 +1,10 @@
 package com.example.git.demo.integration;
 
-import com.example.git.demo.model.BranchResponse;
-import com.example.git.demo.model.Commit;
-import com.example.git.demo.model.Repository;
-import com.example.git.demo.model.RepositoryOwner;
-import com.example.git.demo.model.UserRepositoryResponse;
+import com.example.git.demo.model.client.BranchResponse;
+import com.example.git.demo.model.client.Commit;
+import com.example.git.demo.model.client.Repository;
+import com.example.git.demo.model.client.RepositoryOwner;
+import com.example.git.demo.model.client.UserRepositoryResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,9 @@ public class UserRepositoryIntegrationTest {
     private static final String TEST_USERNAME = "testUsername";
     private static final String INVALID_USERNAME = "invalidUsername";
     private static final String URL_USERS_REPOS = "/users/{username}/repos";
-
+    private static final String TEST_TOKEN = "testToken";
+    private static final String TEST_PAGE = "1";
+    private static final String TEST_PER_PAGE = "1";
     @MockBean
     private RestTemplate restTemplateMock;
 
@@ -56,14 +58,24 @@ public class UserRepositoryIntegrationTest {
         ResponseEntity<List<BranchResponse>> responseEntityForBranches = new ResponseEntity<>(
                 Collections.singletonList(branchResponse), HttpStatus.OK);
 
-        when(restTemplateMock.getForEntity(anyString(), eq(UserRepositoryResponse.class), eq(TEST_USERNAME)))
-                .thenReturn(responseEntityForUserRepos);
         when(restTemplateMock.exchange(
                 anyString(),
                 eq(HttpMethod.GET),
-                eq(null),
+                any(),
+                eq(UserRepositoryResponse.class),
+                any(),
+                any(),
+                any())).thenReturn(responseEntityForUserRepos);
+
+        when(restTemplateMock.exchange(
+                anyString(),
+                eq(HttpMethod.GET),
+                any(),
                 any(ParameterizedTypeReference.class),
-                eq(TEST_USERNAME), eq("testRepoName"))).thenReturn(responseEntityForBranches);
+                eq(TEST_USERNAME),
+                eq("testRepoName"),
+                any(),
+                any())).thenReturn(responseEntityForBranches);
 
         mockMvc.perform(get(URL_USERS_REPOS, TEST_USERNAME)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -73,8 +85,14 @@ public class UserRepositoryIntegrationTest {
     @Test
     void getAllRepositoriesByCustomerName_responseStatusNotFound() throws Exception {
         HttpClientErrorException clientErrorException = new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
-        when(restTemplateMock.getForEntity(anyString(), eq(UserRepositoryResponse.class), eq(INVALID_USERNAME)))
-                .thenThrow(clientErrorException);
+        when(restTemplateMock.exchange(
+                anyString(),
+                eq(HttpMethod.GET),
+                any(),
+                eq(UserRepositoryResponse.class),
+                any(),
+                any(),
+                any())).thenThrow(clientErrorException);
 
         mockMvc.perform(get(URL_USERS_REPOS, INVALID_USERNAME)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))

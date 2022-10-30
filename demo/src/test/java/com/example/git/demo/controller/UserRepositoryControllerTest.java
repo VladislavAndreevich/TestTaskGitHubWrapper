@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 public class UserRepositoryControllerTest {
 
+    private static final String TEST_TOKEN = "testToken";
     private static final String TEST_USERNAME = "testUsername";
 
     private UserRepositoryService serviceMock = mock(UserRepositoryService.class);
@@ -23,17 +24,17 @@ public class UserRepositoryControllerTest {
     @Test
     public void getAllRepositoriesByCustomerName_returnListRepositoriesWhenUserIsFound() {
         List<RepositoryInfo> repositoryInfos = Collections.singletonList(mock(RepositoryInfo.class));
-        when(serviceMock.getAllNotForksReposByCustomerName(TEST_USERNAME)).thenReturn(repositoryInfos);
+        when(serviceMock.getAllNotForksReposByCustomerName(TEST_USERNAME, TEST_TOKEN)).thenReturn(repositoryInfos);
 
-        List<RepositoryInfo> actualRepoInfo = controller.getAllRepositoriesByCustomerName(TEST_USERNAME);
+        List<RepositoryInfo> actualRepoInfo = controller.getAllRepositoriesByCustomerName(TEST_USERNAME, TEST_TOKEN);
 
         assertThat(actualRepoInfo).isEqualTo(repositoryInfos);
     }
 
     @Test
     public void getAllRepositoriesByCustomerName_throwException_whenUserNotFound() {
-        when(serviceMock.getAllNotForksReposByCustomerName(TEST_USERNAME)).thenThrow(new UserNotFoundException("test message"));
+        when(serviceMock.getAllNotForksReposByCustomerName(TEST_USERNAME, TEST_TOKEN)).thenThrow(new UserNotFoundException("test message"));
 
-        assertThrows(UserNotFoundException.class, () -> controller.getAllRepositoriesByCustomerName(TEST_USERNAME));
+        assertThrows(UserNotFoundException.class, () -> controller.getAllRepositoriesByCustomerName(TEST_USERNAME, TEST_TOKEN));
     }
 }

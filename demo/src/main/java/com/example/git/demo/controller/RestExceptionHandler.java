@@ -2,7 +2,6 @@ package com.example.git.demo.controller;
 
 import com.example.git.demo.exception.UserNotFoundException;
 import com.example.git.demo.model.ErrorResponseBody;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
